@@ -80,24 +80,28 @@ if "dados_utilizadores" not in st.session_state:
 if "mostrar_download" not in st.session_state:
     st.session_state.mostrar_download = False
 
-# Lista de interesses (80 cartões)
+# Lista de interesses reduzida (20 cartões)
 interesses = [
-    # Linha 1
-    "Arte Digital", "Design Gráfico", "Fotografia", "Cinema", "Música", "Literatura", "Teatro", "Dança", "Pintura", "Escultura",
-    # Linha 2
-    "Animação", "Moda", "Publicidade", "Comunicação Visual", "Arquitetura", "Ilustração", "Design de Interiores", "Artes Plásticas", "Escultura Contemporânea", "Artes Cênicas",
-    # Linha 3
-    "Programação", "Desenvolvimento de Software", "Jogos Digitais", "Realidade Virtual", "Robótica", "Inteligência Artificial", "Ciência de Dados", "Cibersegurança", "Hardware", "Redes de Computadores",
-    # Linha 4
-    "Empreendedorismo", "Startups", "Inovação", "Marketing Digital", "Negócios", "Finanças", "Investimentos", "Economia", "Planeamento Estratégico", "Gestão de Projectos",
-    # Linha 5
-    "Psicologia", "Sociologia", "Antropologia", "Comportamento Humano", "Saúde Mental", "Neurociência", "Psicoterapia", "Desenvolvimento Pessoal", "Bem-estar", "Autoconhecimento",
-    # Linha 6
-    "Ciências Sociais", "Serviço Social", "Ativismo", "Direitos Humanos", "Educação", "Políticas Públicas", "Engajamento Comunitário", "Voluntariado", "Sustentabilidade", "Cidadania",
-    # Linha 7
-    "Comunicação Empresarial", "Relações Públicas", "Assessoria de Imprensa", "Mídias Sociais", "Eventos", "Branding", "Marketing de Influência", "Comunicação Organizacional", "Liderança", "Networking",
-    # Linha 8
-    "Reportagem", "Investigação", "Redação Jornalística", "Mídia Digital", "Telejornalismo", "Edição de Vídeo", "Fotografia Jornalística", "Entrevistas", "Recrutamento", "Formação"
+    "Arte Digital",
+    "Design Gráfico",
+    "Fotografia",
+    "Cinema",
+    "Música",
+    "Programação",
+    "Desenvolvimento de Software",
+    "Jogos Digitais",
+    "Empreendedorismo",
+    "Marketing Digital",
+    "Psicologia",
+    "Serviço Social",
+    "Comunicação Empresarial",
+    "Jornalismo",
+    "Realidade Virtual",
+    "Robótica",
+    "Arquitetura",
+    "Moda",
+    "Publicidade",
+    "Redes de Computadores"
 ]
 
 # Lista de cursos disponíveis
