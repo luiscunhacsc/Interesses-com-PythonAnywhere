@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 import io
 import csv
+import math
 
 # ------------------------------
 # FUNÇÕES AUXILIARES
@@ -256,8 +257,8 @@ elif st.session_state.page == "selecao_interesses":
         unsafe_allow_html=True
     )
     total_interesses = len(interesses)
-    colunas_por_linha = 10  
-    linhas = total_interesses // colunas_por_linha
+    colunas_por_linha = 5  # Reduzido para 5 botões por linha
+    linhas = math.ceil(total_interesses / colunas_por_linha)
 
     for i in range(linhas):
         cols = st.columns(colunas_por_linha)
@@ -316,7 +317,6 @@ elif st.session_state.page == "resultado_cursos":
             if not validar_email(email):
                 st.error("Por favor, introduz um e-mail válido.")
             else:
-                # Formata os cursos recomendados num string, ordenados por score
                 cursos_recomendados = ", ".join([
                     f"{curso} ({score})" 
                     for curso, score in sorted(recomendados.items(), key=lambda item: item[1], reverse=True)
@@ -332,7 +332,6 @@ elif st.session_state.page == "resultado_cursos":
         else:
             st.error("Por favor, preenche ambos os campos: nome e e-mail.")
 
-    # Botão para limpar todos os dados e voltar ao início
     if st.button("Começar de Novo"):
         st.session_state.selected_interesses = []
         st.session_state.page = "inicio"
