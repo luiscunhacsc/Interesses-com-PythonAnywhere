@@ -1,5 +1,8 @@
 import streamlit as st
 import re
+from datetime import datetime
+import io
+import csv
 
 # ------------------------------
 # FUNÇÕES AUXILIARES
@@ -42,7 +45,6 @@ def toggle_interest(interest):
         st.session_state.selected_interesses.remove(interest)
     else:
         st.session_state.selected_interesses.append(interest)
-    # O Streamlit refaz o script automaticamente após a interação
 
 def obter_cursos_recomendados(selecionados):
     """Calcula os cursos recomendados com base numa lógica de pontuação ponderada."""
@@ -72,7 +74,11 @@ if "page" not in st.session_state:
 if "selected_interesses" not in st.session_state:
     st.session_state.selected_interesses = []
 if "verInteressesDev" not in st.session_state:
-    st.session_state.verInteressesDev = False  # por defeito, não mostra a lista de interesses
+    st.session_state.verInteressesDev = False
+if "dados_utilizadores" not in st.session_state:
+    st.session_state.dados_utilizadores = []
+if "mostrar_download" not in st.session_state:
+    st.session_state.mostrar_download = False
 
 # Lista de interesses (80 cartões)
 interesses = [
@@ -142,6 +148,7 @@ course_icons = {
 
 # Página 0: Ecrã de Boas-Vindas
 if st.session_state.page == "inicio":
+    # Banner de boas-vindas (full width)
     st.markdown(
         """
         <div style="background-color:#4a90e2; padding:50px; border-radius:10px; text-align:center; color:white;">
@@ -159,10 +166,84 @@ if st.session_state.page == "inicio":
         """,
         unsafe_allow_html=True
     )
-    st.write("")
-    if st.button("Começar a Descobrir os Meus Cursos"):
-        st.session_state.page = "selecao_interesses"
-        st.rerun()
+    
+    # CSS para estilo do botão principal e do botão de administração
+    st.markdown(
+        """
+        <style>
+        /* Botão principal (call-to-action) */
+        .main-button .stButton button {
+            background-color: #ff7f50;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 1em 3em;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0px 6px 8px rgba(0,0,0,0.3);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .main-button .stButton button:hover {
+            background-color: #ff9068;
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        /* Botão discreto (admin) */
+        .admin-button .stButton button {
+            background-color: transparent;
+            color: #aaa;
+            font-size: 0.8em;
+            text-decoration: underline;
+            border: none;
+        }
+        .admin-button .stButton button:hover {
+            color: #888;
+            cursor: pointer;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # Botão principal de ação, centralizado
+    with st.container():
+        st.markdown('<div class="main-button" style="text-align:center; margin-top:30px;">', unsafe_allow_html=True)
+        if st.button("📝 Indicar os meus Interesses 📝", key="main_button"):
+            st.session_state.page = "selecao_interesses"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Espaçamento extra
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Botão discreto para administração (Descarregar Dados)
+    with st.container():
+        st.markdown('<div class="admin-button" style="text-align:center;">', unsafe_allow_html=True)
+        if st.button("Descarregar Dados (Admin)", key="download_data_button"):
+            st.session_state.mostrar_download = True
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Se a opção de download foi acionada, solicitar password
+    if st.session_state.mostrar_download:
+        admin_password = st.text_input("Insira a password de administração", type="password")
+        if admin_password == "ismt#2526":
+            st.markdown("#### Dados Recolhidos")
+            buffer = io.StringIO()
+            writer = csv.writer(buffer)
+            writer.writerow(["Nome", "Email", "Interesses", "Cursos_Recomendados"])
+            for entry in st.session_state.dados_utilizadores:
+                writer.writerow([
+                    entry["nome"], 
+                    entry["email"], 
+                    entry["interesses"], 
+                    entry["cursos_recomendados"]
+                ])
+            now = datetime.now()
+            date_str = now.strftime("%d%m%Y")
+            time_str = now.strftime("%H%M%S")
+            filename = f"dados_recolhidos_feira_{date_str}_{time_str}.csv"
+            st.download_button("Descarregar Dados", data=buffer.getvalue(), file_name=filename, mime="text/csv")
 
 # Página 1: Seleção de Interesses
 elif st.session_state.page == "selecao_interesses":
@@ -231,6 +312,18 @@ elif st.session_state.page == "resultado_cursos":
             if not validar_email(email):
                 st.error("Por favor, introduz um e-mail válido.")
             else:
+                # Formata os cursos recomendados num string, ordenados por score
+                cursos_recomendados = ", ".join([
+                    f"{curso} ({score})" 
+                    for curso, score in sorted(recomendados.items(), key=lambda item: item[1], reverse=True)
+                ])
+                interesses_selecionados = ", ".join(st.session_state.selected_interesses)
+                st.session_state.dados_utilizadores.append({
+                    "nome": nome,
+                    "email": email,
+                    "interesses": interesses_selecionados,
+                    "cursos_recomendados": cursos_recomendados
+                })
                 st.success("Obrigado! Em breve entraremos em contacto.")
         else:
             st.error("Por favor, preenche ambos os campos: nome e e-mail.")
